@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-export async function fetchProducts(signal) {
+export async function fetchProducts(filters, signal) {
   const response = await axios.get('/api/products/', {
+    params: filters,
     timeout: 10000,
     signal,
   });

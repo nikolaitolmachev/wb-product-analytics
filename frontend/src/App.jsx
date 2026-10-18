@@ -10,11 +10,27 @@ import {
 } from '@mui/material';
 import { fetchProducts, isRequestCanceled } from './api/products.js';
 import ProductTable from './components/ProductTable.jsx';
+import ProductFilters from './components/ProductFilters.jsx';
+import DashboardStats from './components/DashboardStats.jsx';
+
+const filterNames = ['min_price', 'max_price', 'min_rating', 'min_feedbacks'];
 
 export default function App() {
   const [products, setProducts] = useState([]);
   const [status, setStatus] = useState('loading');
   const [retryCount, setRetryCount] = useState(0);
+  const [appliedFilters, setAppliedFilters] = useState({});
+
+  function applyFilters(filters) {
+    if (filterNames.every((name) => filters[name] === appliedFilters[name])) return;
+    setStatus('loading');
+    setAppliedFilters(filters);
+  }
+
+  function retryProducts() {
+    setStatus('loading');
+    setRetryCount((count) => count + 1);
+  }
 
   useEffect(() => {
     const controller = new AbortController();
@@ -23,7 +39,7 @@ export default function App() {
 
     async function loadProducts() {
       try {
-        const data = await fetchProducts(controller.signal);
+        const data = await fetchProducts(appliedFilters, controller.signal);
         if (active) {
           setProducts(data);
           setStatus('success');
@@ -40,7 +56,7 @@ export default function App() {
       active = false;
       controller.abort();
     };
-  }, [retryCount]);
+  }, [appliedFilters, retryCount]);
 
   return (
     <Container component="main" maxWidth="lg" sx={{ py: { xs: 3, md: 6 } }}>
@@ -60,6 +76,8 @@ export default function App() {
           not live marketplace information.
         </Alert>
 
+        <ProductFilters onApply={applyFilters} />
+
         {status === 'loading' && (
           <Stack role="status" direction="row" spacing={2} alignItems="center">
             <CircularProgress size={24} aria-hidden="true" />
@@ -69,7 +87,7 @@ export default function App() {
 
         {status === 'error' && (
           <Alert severity="error" action={
-            <Button color="inherit" onClick={() => setRetryCount((count) => count + 1)}>
+            <Button color="inherit" onClick={retryProducts}>
               Retry
             </Button>
           }>
@@ -77,9 +95,11 @@ export default function App() {
           </Alert>
         )}
 
+        {status === 'success' && <DashboardStats products={products} />}
+
         {status === 'success' && products.length === 0 && (
           <Alert severity="info" role="status">
-            No products are available in this dataset.
+            No products match the applied filters.
           </Alert>
         )}
 
