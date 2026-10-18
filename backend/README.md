@@ -28,13 +28,18 @@ requirements. Direct dependencies are pinned. Development requirements also pin
 AnyIO for compatibility with Starlette's test client and strict warning checks.
 Other transitive dependencies are resolved by pip rather than locked separately.
 
-Run the checks:
+Run the same checks as `.github/workflows/backend.yml` from the repository root:
 
 ```bash
-python -m pytest -c backend/pytest.ini -W error
 python -m ruff check backend/app backend/tests
 python -m ruff format --check backend/app backend/tests
+python -m pytest -c backend/pytest.ini -W error
 ```
+
+Ruff reads `backend/ruff.toml`. The workflow runs on pull requests
+targeting `main` and pushes to `main`, using Ubuntu and Python 3.12.
+`backend/pytest.ini` enables pytest-socket to block network sockets during tests.
+Only local Unix sockets used by the test client's event loop are allowed.
 
 Start FastAPI:
 

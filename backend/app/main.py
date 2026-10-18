@@ -1,6 +1,7 @@
 """Expose product filtering and explicitly enabled product collection."""
 
 import logging
+from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Query, status
 from sqlalchemy import select
@@ -54,7 +55,7 @@ def _save_products(products: list[ParsedProduct], db: Session) -> list[ProductRe
 
 @app.post("/api/parse-products/", response_model=list[ProductResponse])
 def parse_and_save_products(
-    request: ParseRequest, db: Session = Depends(get_db)
+    request: ParseRequest, db: Annotated[Session, Depends(get_db)]
 ) -> list[ProductResponse]:
     """Collect products and save them only to explicitly writable storage."""
     if db.get_bind().get_execution_options().get("read_only") is not False:
@@ -99,6 +100,7 @@ def parse_and_save_products(
 
 @app.get("/api/products/", response_model=list[ProductResponse])
 def get_products(
+    db: Annotated[Session, Depends(get_db)],
     min_price: float | None = Query(
         None, ge=0, allow_inf_nan=False, description="Minimum discounted price"
     ),
@@ -109,7 +111,6 @@ def get_products(
         None, ge=0, le=5, allow_inf_nan=False, description="Minimum rating"
     ),
     min_feedbacks: int | None = Query(None, ge=0, description="Minimum feedback count"),
-    db: Session = Depends(get_db),
 ) -> list[Product]:
     """Return products matching the inclusive price, rating, and feedback filters."""
     if min_price is not None and max_price is not None and min_price > max_price:
