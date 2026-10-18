@@ -20,19 +20,6 @@ from backend.app.models import Product
 
 
 @pytest.fixture
-def writable_engine(tmp_path: Path) -> Iterator[Engine]:
-    """Create an empty schema only in a temporary working database."""
-    path = tmp_path / "working.sqlite"
-    path.touch()
-    engine = database.create_database_engine(path)
-    database.Base.metadata.create_all(engine)
-    try:
-        yield engine
-    finally:
-        engine.dispose()
-
-
-@pytest.fixture
 def sample_client() -> Iterator[TestClient]:
     """Use an explicit read-only engine regardless of local configuration."""
     engine = database.create_database_engine()

@@ -33,5 +33,7 @@ class Product(ProductBase):
 class ParseRequest(BaseModel):
     """Specify the query and bounded page count for product collection."""
 
-    query: str = Field(..., examples=["футболка женская"])
-    pages: int = Field(1, ge=1, le=100, examples=[3])
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    query: str = Field(min_length=1, examples=["футболка женская"])
+    pages: int = Field(1, ge=1, le=100, strict=True, examples=[3])

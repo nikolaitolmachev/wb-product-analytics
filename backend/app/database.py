@@ -5,7 +5,7 @@ from collections.abc import Iterator
 from pathlib import Path
 
 from sqlalchemy import URL, Engine, create_engine
-from sqlalchemy.orm import Session, declarative_base, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SAMPLE_DATABASE_PATH = PROJECT_ROOT / "backend" / "data" / "sample.sqlite"
@@ -50,7 +50,10 @@ def create_database_engine(database_path: str | Path | None = None) -> Engine:
 
 engine = create_database_engine(os.environ.get("DATABASE_PATH"))
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+
+
+class Base(DeclarativeBase):
+    """Provide the typed SQLAlchemy base for the existing database models."""
 
 
 def get_db() -> Iterator[Session]:
