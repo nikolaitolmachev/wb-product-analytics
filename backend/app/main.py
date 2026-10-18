@@ -2,21 +2,23 @@ from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List
 
-from .database import engine, Base, get_db
+from .database import get_db
 from .models import Product
 from .schemas import Product as SProduct, ParseRequest
 from .parser import WBParser
 
-
 # create application
 app = FastAPI()
-
-# create tables in database
-Base.metadata.create_all(bind=engine)
 
 
 @app.post('/api/parse-products/', response_model=List[SProduct])
 def parse_and_save_products(request: ParseRequest, db: Session = Depends(get_db)):
+    if db.get_bind().get_execution_options().get("read_only", False):
+        raise HTTPException(
+            status_code=403,
+            detail="Product collection is disabled for the read-only sample database.",
+        )
+
     processed_products = []
 
     parser = WBParser(request.query, request.pages)
