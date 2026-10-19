@@ -1,67 +1,121 @@
-Тестовое задание для кандидата
-Цель : Создать простой сервис аналитики товаров с визуализацией данных на фронтенде.
+<div align="center">
 
-Часть 1: Backend 
-Парсер данных :
-Написать скрипт для парсинга данных о товарах с сайта Wildberries (категория/запрос вносится пользователем).
-Поля: название товара, цена, цена со скидкой, рейтинг, количество отзывов.
-Сохранять данные в бд.
-API-эндпоинт :
-Создать эндпоинт /api/products/ с поддержкой фильтрации:
-По цене, рейтингу, количеству отзывов.
-Пример запроса: GET /api/products/?min_price=5000&min_rating=4.
+# Wildberries Product Analytics
 
-Часть 2: Frontend
-1. Таблица товаров
-• Создать таблицу с колонками:
-• Название товара
-• Цена
-• Цена со скидкой
-• Рейтинг
-• Количество отзывов
-Функционал таблицы :
-Фильтры :
-• Слайдер для диапазона цен (минимальная цена — максимальная цена).
-• Фильтр по минимальному рейтингу (например, от 4.0 и выше).
-• Фильтр по минимальному количеству отзывов (например, от 100 и выше).
-Сортировка :
-По возрастанию/убыванию рейтинга, количеству отзывов, цене, названию
-Динамическое обновление: При изменении фильтров таблица должна перерисовываться с учетом новых данных.
-2. Диаграммы
-Реализовать графики, которые обновляются при изменении фильтров:
-Гистограмма цен : Распределение цены vs количество товаров (диапазоны цен выбрать любые).
-Линейный график : Размер скидки на товар vs рейтинг товара.
-<hr/>
+A full-stack web application for exploring and analyzing Wildberries product data, built with FastAPI, React, and SQLite.
 
-![Screen](/frontend/src/final_0.jpg)
+Features interactive filtering, sortable product tables, and visual analytics using 100 real Wildberries products previously collected and stored in SQLite.
 
-![Screen](frontend/src/final.jpg)
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)
+[![Backend CI](https://github.com/nikolaitolmachev/wb-product-analytics/actions/workflows/backend.yml/badge.svg)](https://github.com/nikolaitolmachev/wb-product-analytics/actions/workflows/backend.yml)
+[![Frontend CI](https://github.com/nikolaitolmachev/wb-product-analytics/actions/workflows/frontend.yml/badge.svg)](https://github.com/nikolaitolmachev/wb-product-analytics/actions/workflows/frontend.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-<hr/>
+</div>
 
-## Инструкция по развертыванию (локально)
+---
 
-Загрузить файлы на сервер в папку, в которой будет храниться сервис.
+## Demo
+
+<div align="center">
+
+![Wildberries Product Analytics Demo](assets/dashboard-demo.gif)
+
+</div>
+
+---
+
+## Features
+
+- **Product Collection & Storage** — Collect Wildberries product data through an API-based parser and store it in SQLite, subject to endpoint availability.
+- **Product Filtering** — Filter products by price range, minimum rating, and feedback count.
+- **Analytics Dashboard** — Explore summary metrics, price distributions, and discount-versus-rating relationships through interactive charts.
+- **Product Table** — Browse and sort products by name, prices, discounts, ratings, and feedback count.
+
+---
+
+## Tech Stack
+
+| Component | Technologies |
+|---|---|
+| **Backend** | Python 3.12, FastAPI, Pydantic, SQLAlchemy |
+| **Database** | SQLite |
+| **Frontend** | React 19, JavaScript, Vite, Material UI, Recharts |
+| **HTTP Clients** | Requests, Axios |
+| **Testing** | pytest, Vitest, React Testing Library |
+| **Code Quality** | Ruff, ESLint |
+| **CI** | GitHub Actions |
+
+---
+
+## Architecture
+
+```text
+              React (Material UI + Recharts)
+                           |
+                         Axios
+                           |
+                           v
+                     FastAPI REST API
+                           |
+                +----------+----------+
+                |                     |
+                v                     v
+        Product Retrieval       WB Product Parser
+          & Filtering                  |
+                |                     v
+                |              Wildberries API
+                |                     |
+                v                     |
+            SQLAlchemy <--------------+
+                |
+                v
+              SQLite
 ```
-git clone https://github.com/nikolaitolmachev/wildberries.git
+
+---
+
+## Screenshots
+
+<table>
+  <tr>
+    <th align="center">Dashboard Overview</th>
+    <th align="center">Analytics</th>
+    <th align="center">Product Table</th>
+  </tr>
+  <tr>
+    <td><img src="assets/dashboard-overview.jpg" width="300" height="200" alt="Dashboard overview" /></td>
+    <td><img src="assets/analytics-charts.jpg" width="300" height="200" alt="Price distribution and discount analysis" /></td>
+    <td><img src="assets/products-table.jpg" width="300" height="200" alt="Sortable product table" /></td>
+  </tr>
+</table>
+
+---
+
+## Getting Started
+
+Clone the repository and follow the setup instructions for each component:
+
+```bash
+git clone https://github.com/nikolaitolmachev/wb-product-analytics.git
+cd wb-product-analytics
 ```
-Открыть терминал и перейти в каталог, куда загружены эти файлы, и выполнить последовательно команды:
-```
-chmod +x build.sh
-./build.sh
 
-chmod +x run.sh
-./run.sh
-```
+- [Backend Development Guide](backend/README.md) — Installation, database configuration, and API setup.
+- [Frontend Development Guide](frontend/README.md) — Installation, development server, and production build.
 
-Сервис будет доступен по следующим адресам:
+---
 
-    Frontend (React-приложение):
-    http://localhost:3000
-    Здесь будет доступен пользовательский интерфейс.
+## Future Improvements
 
-    Backend (FastAPI API): 
-    http://localhost:8000
-    Все запросы с фронтенда к API автоматически проксируются на этот адрес.
+- **Wildberries API Integration** — Adapt the product parser to supported data access methods for reliable collection.
+- **Historical Price Tracking** — Store periodic price snapshots to analyze trends and changes over time.
+- **Data Export** — Export filtered product data to CSV or Excel.
 
+---
 
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

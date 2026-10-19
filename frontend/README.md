@@ -1,36 +1,73 @@
-# Frontend development
+# Frontend — Development Guide
 
-Use Node.js 24 LTS (24.15 or newer in the 24.x release line).
-The verified version is recorded in `.nvmrc`.
-Run the following commands from `frontend/`:
+React frontend for Wildberries Product Analytics, providing an interactive dashboard for exploring product prices, discounts, and ratings.
+
+## Tech Stack
+
+- React 19 and JavaScript
+- Vite 8
+- Material UI
+- Recharts
+- Axios
+- Vitest, React Testing Library, and ESLint
+
+## Installation
+
+From the repository root:
 
 ```bash
-nvm use # If nvm is installed; install the specified Node version first if needed.
+cd frontend
+nvm install
+nvm use
 npm ci
+```
+
+The project uses Node.js 24, configured in `.nvmrc`. Dependencies are installed from `package-lock.json`.
+
+## Running the Application
+
+With FastAPI running on port `8000`, start the frontend from `frontend/`:
+
+```bash
 npm run dev
 ```
 
-Check `node --version` in each new terminal: it must match `.nvmrc`.
-The Python virtual environment does not select a Node.js version.
+Open [http://localhost:5173](http://localhost:5173).
 
-Start the FastAPI backend separately on port 8000. Vite serves the frontend at
-<http://localhost:5173> and proxies `/api` to <http://127.0.0.1:8000>.
-The bundled dataset contains historical sample products, not live marketplace data.
+The Vite development server proxies `/api` requests to `http://127.0.0.1:8000`.
+
+## Testing and Code Quality
+
+Run the following commands from `frontend/`.
+
+**Tests**
 
 ```bash
 npm test
-npm run lint
-npm run build
-npm run preview
 ```
 
-The frontend GitHub Actions workflow runs `npm ci`, `npm test`, `npm run lint`,
-and `npm run build` on Ubuntu using the version in `.nvmrc`. Run these same
-commands from `frontend/` to reproduce the checks locally.
+**ESLint**
 
-Tests mock the API and do not require a backend or Wildberries access.
-The production build is written to `dist/`. The deployment environment must
-route same-origin `/api/` requests to FastAPI. The development proxy is not
-included in the production build, and `vite preview` is only a local preview.
-Charts and the product table load in separate chunks after a nonempty API
-response; their loading messages leave the filters and summary available.
+```bash
+npm run lint
+```
+
+**Production build**
+
+```bash
+npm run build
+```
+
+The production build is generated in `frontend/dist/`.
+
+Frontend tests use mocked API responses and do not require a running backend.
+
+The same checks are executed by GitHub Actions on pull requests targeting `main` and pushes to `main`.
+
+## Production Configuration
+
+The Vite development proxy is not included in production builds. The deployed application must route `/api` requests to the FastAPI backend.
+
+---
+
+[← Back to Project Overview](../README.md) · [Backend Development Guide](../backend/README.md)

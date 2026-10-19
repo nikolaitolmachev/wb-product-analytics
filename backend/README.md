@@ -1,104 +1,99 @@
-# Local development
+# Backend — Development Guide
 
-Keep the backend and frontend in separate terminals. Unless a command says
-otherwise, run it from the repository root.
+FastAPI backend for Wildberries Product Analytics, providing product filtering, SQLite storage, and optional product collection through the original Wildberries search integration.
 
-## Prerequisites
+## Tech Stack
 
-- Python 3.12 (verified with 3.12.3).
-- Node.js 20.20.1 and npm 11.12.1, the versions verified with the existing
-  frontend lockfile. Other Node.js versions have not been verified here.
+- Python 3.12
+- FastAPI and Pydantic
+- SQLAlchemy and SQLite
+- Requests
+- pytest and Ruff
 
-## Backend
+## Installation
 
-Create and activate a virtual environment, then install the application and
-development dependencies:
+From the repository root:
 
 ```bash
-python3 -m venv .venv
+cd backend
+python3.12 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r backend/requirements-dev.txt
+python -m pip install -r requirements-dev.txt
 python -m pip check
 ```
 
-On Windows, use `py -3.12 -m venv .venv` and activate with
-`.venv\Scripts\Activate.ps1` in PowerShell. For runtime dependencies only, install
-`backend/requirements.txt` instead. Development requirements include runtime
-requirements. Direct dependencies are pinned. Development requirements also pin
-AnyIO for compatibility with Starlette's test client and strict warning checks.
-Other transitive dependencies are resolved by pip rather than locked separately.
+Development dependencies include application dependencies, pytest, Ruff, and testing utilities.
 
-Run the same checks as `.github/workflows/backend.yml` from the repository root:
+For application dependencies only, use `requirements.txt` instead of `requirements-dev.txt`.
+
+## Running the API
+
+With the virtual environment activated, from `backend/`:
 
 ```bash
-python -m ruff check backend/app backend/tests
-python -m ruff format --check backend/app backend/tests
-python -m pytest -c backend/pytest.ini -W error
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-Ruff reads `backend/ruff.toml`. The workflow runs on pull requests
-targeting `main` and pushes to `main`, using Ubuntu and Python 3.12.
-`backend/pytest.ini` enables pytest-socket to block network sockets during tests.
-Only local Unix sockets used by the test client's event loop are allowed.
+**Available endpoints:**
 
-Start FastAPI:
+| Endpoint | Description |
+|---|---|
+| `GET /api/products/` | Retrieve and filter stored products |
+| `POST /api/parse-products/` | Collect and store products when a writable database is configured |
+| `GET /docs` | Interactive Swagger API documentation |
+| `GET /redoc` | Alternative API documentation |
+| `GET /openapi.json` | OpenAPI schema |
 
-```bash
-python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
-```
+**Product filters:** `min_price`, `max_price`, `min_rating`, and `min_feedbacks`.
 
-- Products: <http://localhost:8000/api/products/>
-- Swagger UI: <http://localhost:8000/docs>
-- OpenAPI schema: <http://localhost:8000/openapi.json>
+Price filtering uses discounted prices in Russian rubles.
 
-### Sample database and optional collection
+API documentation: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
-The bundled `backend/data/sample.sqlite` contains 100 historical products, not
-live marketplace data. The backend opens it read-only and rejects product
-collection with HTTP 403 before calling the parser. Database paths do not depend
-on the current working directory. The application never creates missing files
-or tables automatically.
+## Database Configuration
 
-To enable collection into a separate local database, copy the sample once and
-export its path before starting FastAPI:
+By default, the application uses `backend/data/sample.sqlite`, a read-only database containing 100 previously collected Wildberries products.
+
+To enable writing, create a separate database from the sample and configure its path:
 
 ```bash
-cp -n backend/data/sample.sqlite backend/data/local.sqlite
+# Run from the repository root
+cp backend/data/sample.sqlite backend/data/local.sqlite
 export DATABASE_PATH=backend/data/local.sqlite
 ```
 
-`DATABASE_PATH` must name an existing SQLite file with the existing schema;
-relative paths resolve from the repository root. Writable paths pointing to the
-sample, including file aliases, are rejected. Unset `DATABASE_PATH` to return to
-read-only sample mode. `.env.example` documents this variable; `.env` is not
-loaded automatically.
+## Testing and Code Quality
 
-The original unofficial Wildberries search endpoint may no longer be accessible;
-previous live verification returned HTTP 403. Writable storage does not guarantee
-live collection will work. Viewing the sample and running tests require no
-Wildberries access. Tests mock external requests and write only to temporary
-databases; the sample checksum is checked before and after the test suite.
+Run the following commands from `backend/` with the development environment activated.
 
-## Frontend
-
-In a separate terminal, install from the existing lockfile and start React:
-
-Stop an existing React development server before reinstalling dependencies.
+**Tests**
 
 ```bash
-cd frontend
-npm ci
-npm start
+python -m pytest -W error
 ```
 
-Open <http://localhost:3000>. Keep FastAPI running on port 8000; the React
-development server proxies API requests there.
-
-Build the frontend from `frontend/`:
+**Ruff linting**
 
 ```bash
-npm run build
+python -m ruff check app tests
 ```
 
-The generated files are written to `frontend/build/`. This command builds the
-frontend only; it does not start a server or configure API hosting.
+**Ruff formatting check**
+
+```bash
+python -m ruff format --check app tests
+```
+
+Backend tests use isolated temporary SQLite databases and mocked external requests. Network sockets are blocked during automated tests, preventing accidental calls to Wildberries.
+
+The same checks are executed by GitHub Actions on pull requests targeting `main` and pushes to `main`.
+
+## Known Limitations
+
+The original parser uses an unofficial Wildberries API endpoint that may no longer be accessible (previously returned HTTP `403`).
+
+Live product collection is not guaranteed, even with a writable database.
+
+---
+
+[← Back to Project Overview](../README.md) · [Frontend Development Guide](../frontend/README.md)
