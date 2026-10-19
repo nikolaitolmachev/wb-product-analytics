@@ -68,14 +68,13 @@ export default function App() {
             Wildberries Product Analytics
           </Typography>
           <Typography color="text.secondary">
-            Explore the included product dataset.
+            Explore product prices, ratings, and discounts.
           </Typography>
         </Box>
 
         <Alert severity="info" role="note">
-          Product information is loaded from the current application database.
-          The bundled database contains historical Wildberries sample data,
-          not live marketplace information.
+          Displaying real Wildberries data collected earlier and stored in the
+          application database. Live marketplace data is not included.
         </Alert>
 
         <ProductFilters onApply={applyFilters} />
@@ -107,10 +106,18 @@ export default function App() {
 
         {status === 'success' && products.length > 0 && (
           <>
-            <Suspense fallback={<Typography role="status">Loading charts…</Typography>}>
+            <Suspense fallback={
+              <Box role="status" sx={{ minHeight: { xs: 960, md: 552 } }}>
+                <Typography>Loading charts…</Typography>
+              </Box>
+            }>
               <ProductCharts products={products} />
             </Suspense>
-            <Suspense fallback={<Typography role="status">Loading product table…</Typography>}>
+            <Suspense fallback={
+              <Box role="status" sx={{ minHeight: 320 }}>
+                <Typography>Loading product table…</Typography>
+              </Box>
+            }>
               <ProductTable products={products} />
             </Suspense>
           </>

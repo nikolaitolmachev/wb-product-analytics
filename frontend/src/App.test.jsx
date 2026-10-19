@@ -30,13 +30,15 @@ test('shows loading before the API responds', () => {
   expect(screen.queryByRole('table')).not.toBeInTheDocument();
 });
 
-test('loads products and identifies the historical sample dataset', async () => {
+test('loads products and identifies the stored Wildberries dataset', async () => {
   fetchProductsMock.mockResolvedValue(products);
   render(<App />);
   expect(await screen.findByRole('link', { name: 'Sample shirt' })).toBeInTheDocument();
   expect(screen.getByRole('table')).toBeInTheDocument();
   expect(await screen.findByRole('region', { name: 'Product analytics' })).toBeInTheDocument();
-  expect(screen.getByRole('note')).toHaveTextContent(/historical Wildberries sample data/i);
+  expect(screen.getByRole('note')).toHaveTextContent(
+    'Displaying real Wildberries data collected earlier and stored in the application database. Live marketplace data is not included.',
+  );
   expect(screen.queryByText('Loading products…')).not.toBeInTheDocument();
   expect(fetchProductsMock).toHaveBeenCalledWith({}, expect.any(AbortSignal));
 });
@@ -119,7 +121,7 @@ test('hides previous results while applying filters and after a failed request',
   fireEvent.click(screen.getByRole('button', { name: 'Apply filters' }));
   expect(screen.getByRole('status')).toHaveTextContent('Loading products');
   expect(screen.queryByRole('table')).not.toBeInTheDocument();
-  expect(screen.queryByRole('region', { name: 'Current result summary' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('region', { name: 'Product Overview' })).not.toBeInTheDocument();
   await act(async () => { fail(new Error('Unavailable')); });
   expect(screen.getByRole('alert')).toHaveTextContent('Unable to load products');
   expect(screen.queryByRole('table')).not.toBeInTheDocument();

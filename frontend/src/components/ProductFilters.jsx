@@ -5,7 +5,7 @@ const emptyFields = { min_price: '', max_price: '', min_rating: '', min_feedback
 const fields = [
   { name: 'min_price', label: 'Minimum price (₽)', input: { min: 0, step: 'any' } },
   { name: 'max_price', label: 'Maximum price (₽)', input: { min: 0, step: 'any' } },
-  { name: 'min_rating', label: 'Minimum rating', input: { min: 0, max: 5, step: 'any' } },
+  { name: 'min_rating', label: 'Minimum rating', input: { min: 0, max: 5, step: 0.1 } },
   { name: 'min_feedbacks', label: 'Minimum feedback count', input: { min: 0, step: 1 } },
 ];
 
@@ -54,23 +54,23 @@ export default function ProductFilters({ onApply }) {
 
   return (
     <Paper component="form" aria-label="Product filters" variant="outlined"
+      aria-description="Blank fields impose no restriction. Price filters use discounted prices."
       noValidate onSubmit={handleSubmit} sx={{ p: { xs: 2, md: 3 } }}>
       <Stack spacing={2}>
         <Typography component="h2" variant="h6">Product filters</Typography>
         <Typography variant="body2" color="text.secondary">
-          Leave fields blank for no restriction. Results reflect applied filters;
-          edits take effect only after Apply filters.
+          Set your criteria and click Apply filters.
         </Typography>
         <Box sx={{ display: 'grid', gap: 2,
           gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' } }}>
           {fields.map(({ name, label, input }) => (
-            <TextField key={name} label={label} type="number" value={values[name]}
+            <TextField key={name} label={label} type="number" value={values[name]} fullWidth
               slotProps={{ htmlInput: input }}
               onChange={(event) => setValues((previous) => ({
                 ...previous, [name]: event.target.value,
               }))}
               error={submitted && Boolean(errors[name])}
-              helperText={submitted && errors[name] ? errors[name] : 'Optional'}
+              helperText={submitted ? errors[name] : undefined}
             />
           ))}
         </Box>

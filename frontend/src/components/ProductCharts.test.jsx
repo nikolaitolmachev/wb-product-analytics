@@ -27,7 +27,8 @@ test('renders both charts with units, descriptions and accessible histogram coun
   expect(within(histogram).getByText('View distribution counts')).toBeInTheDocument();
   expect(within(scatter).getByText('Discount (%)')).toBeInTheDocument();
   expect(within(scatter).getByText('Rating')).toBeInTheDocument();
-  expect(within(scatter).getByText(/not a calculated correlation/)).toBeInTheDocument();
+  expect(scatter).toHaveAccessibleDescription(/not a calculated correlation/);
+  expect(histogram).toHaveAccessibleDescription(/Lower bounds are included/);
 });
 
 test('explains missing chart observations without drawing fabricated values', () => {
