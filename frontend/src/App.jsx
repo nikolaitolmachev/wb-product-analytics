@@ -12,6 +12,7 @@ import { fetchProducts, isRequestCanceled } from './api/products.js';
 import ProductTable from './components/ProductTable.jsx';
 import ProductFilters from './components/ProductFilters.jsx';
 import DashboardStats from './components/DashboardStats.jsx';
+import ProductCharts from './components/ProductCharts.jsx';
 
 const filterNames = ['min_price', 'max_price', 'min_rating', 'min_feedbacks'];
 
@@ -104,7 +105,10 @@ export default function App() {
         )}
 
         {status === 'success' && products.length > 0 && (
-          <ProductTable products={products} />
+          <>
+            <ProductCharts products={products} />
+            <ProductTable products={products} />
+          </>
         )}
       </Stack>
     </Container>
