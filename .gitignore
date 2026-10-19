@@ -1,9 +1,9 @@
 # Python virtual environments.
-.venv
-venv
+.venv/
+venv/
 
 # IDE settings.
-.idea
+.idea/
 
 # Python bytecode and tooling caches.
 __pycache__/
