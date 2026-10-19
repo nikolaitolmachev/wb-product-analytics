@@ -35,6 +35,7 @@ test('loads products and identifies the historical sample dataset', async () => 
   render(<App />);
   expect(await screen.findByRole('link', { name: 'Sample shirt' })).toBeInTheDocument();
   expect(screen.getByRole('table')).toBeInTheDocument();
+  expect(await screen.findByRole('region', { name: 'Product analytics' })).toBeInTheDocument();
   expect(screen.getByRole('note')).toHaveTextContent(/historical Wildberries sample data/i);
   expect(screen.queryByText('Loading products…')).not.toBeInTheDocument();
   expect(fetchProductsMock).toHaveBeenCalledWith({}, expect.any(AbortSignal));

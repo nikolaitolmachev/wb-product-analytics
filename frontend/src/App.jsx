@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import {
   Alert,
   Box,
@@ -9,10 +9,11 @@ import {
   Typography,
 } from '@mui/material';
 import { fetchProducts, isRequestCanceled } from './api/products.js';
-import ProductTable from './components/ProductTable.jsx';
 import ProductFilters from './components/ProductFilters.jsx';
 import DashboardStats from './components/DashboardStats.jsx';
-import ProductCharts from './components/ProductCharts.jsx';
+
+const ProductCharts = lazy(() => import('./components/ProductCharts.jsx'));
+const ProductTable = lazy(() => import('./components/ProductTable.jsx'));
 
 const filterNames = ['min_price', 'max_price', 'min_rating', 'min_feedbacks'];
 
@@ -106,8 +107,12 @@ export default function App() {
 
         {status === 'success' && products.length > 0 && (
           <>
-            <ProductCharts products={products} />
-            <ProductTable products={products} />
+            <Suspense fallback={<Typography role="status">Loading charts…</Typography>}>
+              <ProductCharts products={products} />
+            </Suspense>
+            <Suspense fallback={<Typography role="status">Loading product table…</Typography>}>
+              <ProductTable products={products} />
+            </Suspense>
           </>
         )}
       </Stack>
